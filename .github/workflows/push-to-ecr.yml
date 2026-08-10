@@ -1,0 +1,64 @@
+name: Build and Push Ticketing Images
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-south-1
+  AWS_ACCOUNT_ID: "051146571550"
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::051146571550:role/ticketing-v2-github-actions-role
+          aws-region: ap-south-1
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build event-service image
+        run: |
+          docker build \
+            -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ticketing-v2-event-service:latest \
+            ./event-service
+
+      - name: Push event-service image
+        run: |
+          docker push \
+            $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ticketing-v2-event-service:latest
+
+      - name: Build booking-service image
+        run: |
+          docker build \
+            -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ticketing-v2-booking-service:latest \
+            ./booking-service
+
+      - name: Push booking-service image
+        run: |
+          docker push \
+            $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ticketing-v2-booking-service:latest
+
+      - name: Build agent-service image
+        run: |
+          docker build \
+            -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ticketing-v2-agent-service:latest \
+            ./agent-service
+
+      - name: Push agent-service image
+        run: |
+          docker push \
+            $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ticketing-v2-agent-service:latest
