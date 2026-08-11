@@ -8,6 +8,12 @@ metadata:
 spec:
   replicas: 1
 
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+
   selector:
     matchLabels:
       app: event-service
@@ -20,9 +26,7 @@ spec:
     spec:
       containers:
         - name: event-service
-
           image: 051146571550.dkr.ecr.ap-south-1.amazonaws.com/ticketing-v2-event-service:latest
-
           imagePullPolicy: Always
 
           ports:
