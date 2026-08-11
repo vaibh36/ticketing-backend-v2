@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: booking-service
+  namespace: ticketing-v2
+
+spec:
+  selector:
+    app: booking-service
+
+  ports:
+    - protocol: TCP
+      port: 8002
+      targetPort: 8002
+
+  type: ClusterIP

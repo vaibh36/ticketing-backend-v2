@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: booking-deployment
+  namespace: ticketing-v2
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: booking-service
+
+  template:
+    metadata:
+      labels:
+        app: booking-service
+
+    spec:
+      containers:
+        - name: booking-service
+
+          image: 051146571550.dkr.ecr.ap-south-1.amazonaws.com/ticketing-v2-booking-service:latest
+
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 8002
+
+          envFrom:
+            - secretRef:
+                name: ticketing-db-secret
+
+          env:
+            - name: DB_NAME
+              value: booking_db
+
+            - name: EVENT_SERVICE_URL
+              value: http://event-service:8001

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: agent-deployment
+  namespace: ticketing-v2
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: agent-service
+
+  template:
+    metadata:
+      labels:
+        app: agent-service
+
+    spec:
+      containers:
+        - name: agent-service
+
+          image: 051146571550.dkr.ecr.ap-south-1.amazonaws.com/ticketing-v2-agent-service:latest
+
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 8003
+
+          envFrom:
+            - secretRef:
+                name: ticketing-openai-secret
+
+          env:
+            - name: EVENT_SERVICE_URL
+              value: http://event-service:8001
+
+            - name: BOOKING_SERVICE_URL
+              value: http://booking-service:8002
